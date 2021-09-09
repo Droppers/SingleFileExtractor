@@ -1,7 +1,7 @@
 <h1 align="center"><img src="https://svgur.com/i/_YV.svg" height="45" valign="text-bottom">&nbsp;&nbsp;RefScout - Reference Analyzer</h1></br>
 <p align="center">
-  RefScout is a desktop and command-line application that assists you with identifying conflicting assembly references in your .NET Framework and .NET Core applications.<br><br>
-  <img src="https://i.imgur.com/SzQCpyY.png" height="500">
+  A tool to extract the contents of a single file application to a directory.
+
 </p>
 
 <h6 align="center">
@@ -31,3 +31,6 @@ Install the `SingleFileExtractor.Core` NuGet package to use it programmatically:
 ```csharp
 BundleExtractor.Extract("application.exe", "path/to/output");
 ```
+
+## Why
+Another application I am working on requires me to extract the contents of single file applications. Since I have seen people asking for a way of doing this, I decided to turn it into a DotNet tool. 
