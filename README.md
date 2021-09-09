@@ -1,4 +1,4 @@
-<h1 align="center"><img src="https://svgur.com/i/_YV.svg" height="45" valign="text-bottom">&nbsp;&nbsp;RefScout - Reference Analyzer</h1></br>
+<h1 align="center">SingleFileExtractor</h1></br>
 <p align="center">
   A tool to extract the contents of a single file application to a directory.
 
