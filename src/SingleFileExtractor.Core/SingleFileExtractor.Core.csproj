@@ -1,0 +1,42 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <DisableImplicitNamespaceImports>true</DisableImplicitNamespaceImports>
+    <Nullable>enable</Nullable>
+    <LangVersion>9.0</LangVersion>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageId>SingleFileExtractor.Core</PackageId>
+    <IsPackable>true</IsPackable>
+    <Title>SingleFileExtractor.Core</Title>
+    <Summary>A library to programmatically extract the contents of a single file application to a directory.</Summary>
+    <Description>A library to programmatically extract the contents of a single file application to a directory.</Description>
+    <PackageDescription>A library to programmatically extract the contents of a single file application to a directory.</PackageDescription>
+    <PackageTags>single-file;executable;extractor</PackageTags>
+    <Authors>Joery Droppers</Authors>
+    <Version>1.0.0</Version>
+    <PackageReadmeFile>NuGet.md</PackageReadmeFile>
+
+    <PackageOutputDir>../../nupkg/</PackageOutputDir>
+    <Authors>Joery Droppers</Authors>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageProjectUrl>https://github.com/Droppers/SingleFileExtractor/</PackageProjectUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="NuGet.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+</Project>

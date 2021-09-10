@@ -1,0 +1,51 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31612.314
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SingleFileExtractor.CLI", "src\SingleFileExtractor.CLI\SingleFileExtractor.CLI.csproj", "{B3F8FBC0-70C9-4CDF-9FA1-F9AD0A0CA632}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SingleFileExtractor.Core", "src\SingleFileExtractor.Core\SingleFileExtractor.Core.csproj", "{E1525901-26F0-420C-B6FC-F70DDCC1E9DD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{CFEFD8AE-D571-4C57-9CAE-78EE8ADE6CA5}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{62EA89FC-1A16-4FB6-BC0A-01DAF6E3BBE9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{2F4C7B23-4674-44F0-934A-D890AAB19551}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SingleFileExtractor.Core.Tests", "test\SingleFileExtractor.Core.Tests\SingleFileExtractor.Core.Tests.csproj", "{D6369D11-0469-474A-B1BE-E79BB93C551F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B3F8FBC0-70C9-4CDF-9FA1-F9AD0A0CA632}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B3F8FBC0-70C9-4CDF-9FA1-F9AD0A0CA632}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B3F8FBC0-70C9-4CDF-9FA1-F9AD0A0CA632}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B3F8FBC0-70C9-4CDF-9FA1-F9AD0A0CA632}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E1525901-26F0-420C-B6FC-F70DDCC1E9DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E1525901-26F0-420C-B6FC-F70DDCC1E9DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E1525901-26F0-420C-B6FC-F70DDCC1E9DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E1525901-26F0-420C-B6FC-F70DDCC1E9DD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D6369D11-0469-474A-B1BE-E79BB93C551F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D6369D11-0469-474A-B1BE-E79BB93C551F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D6369D11-0469-474A-B1BE-E79BB93C551F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D6369D11-0469-474A-B1BE-E79BB93C551F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{B3F8FBC0-70C9-4CDF-9FA1-F9AD0A0CA632} = {62EA89FC-1A16-4FB6-BC0A-01DAF6E3BBE9}
+		{E1525901-26F0-420C-B6FC-F70DDCC1E9DD} = {62EA89FC-1A16-4FB6-BC0A-01DAF6E3BBE9}
+		{D6369D11-0469-474A-B1BE-E79BB93C551F} = {2F4C7B23-4674-44F0-934A-D890AAB19551}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BFAC65D9-E86C-41E1-8940-33E07110C27F}
+	EndGlobalSection
+EndGlobal
