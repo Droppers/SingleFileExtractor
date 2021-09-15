@@ -8,13 +8,13 @@ namespace SingleFileExtractor.Core
 {
     public class BundleExtractor : IBundleExtractor
     {
-        private readonly ManifestReader _manifestReader;
+        private readonly IExecutableReader _executableReader;
 
-        public BundleExtractor() : this(new ManifestReader()) { }
+        public BundleExtractor() : this(new ExecutableReader()) { }
 
-        public BundleExtractor(ManifestReader manifestReader)
+        public BundleExtractor(IExecutableReader executableReader)
         {
-            _manifestReader = manifestReader;
+            _executableReader = executableReader;
         }
 
         public Manifest ExtractToDirectory(string fileName, string outputDirectory)
@@ -35,7 +35,7 @@ namespace SingleFileExtractor.Core
 
         public Manifest ExtractToDirectory(MemoryMappedViewAccessor viewAccessor, string outputDirectory)
         {
-            var manifest = _manifestReader.Read(viewAccessor);
+            var manifest = _executableReader.ReadManifest(viewAccessor);
 
             // Maintain a list of extracted files to be able to remove them if extraction fails
             var fileNames = new List<string>();

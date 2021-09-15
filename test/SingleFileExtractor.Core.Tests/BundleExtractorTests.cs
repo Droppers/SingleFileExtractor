@@ -35,15 +35,16 @@ namespace SingleFileExtractor.Core.Tests
         [Fact]
         public void Extract_WithCompression()
         {
-            _extractor.ExtractToDirectory(GetPath("Compression.exe"), "output/compression");
+            var result = _extractor.ExtractToDirectory(GetPath("Compression.exe"), "output/compression");
+            Assert.Equal("Compression.dll", result.StartupInfo.EntryPoint);
         }
 
         [Fact]
         public void Extract_WithoutCompression()
         {
-            _extractor.ExtractToDirectory(GetPath("NoCompression.exe"), "output/no-compression");
+            var result = _extractor.ExtractToDirectory(GetPath("NoCompression.exe"), "output/no-compression");
+            Assert.Equal("Compression.dll", result.StartupInfo.EntryPoint);
         }
-
 
         private static string GetPath(string name) => Path.Combine(AppContext.BaseDirectory, "TestFiles", name);
     }

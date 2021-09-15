@@ -20,7 +20,7 @@
     <PackageDescription>A tool to extract the contents of a single file application to a directory.</PackageDescription>
     <PackageTags>single-file;executable;extractor</PackageTags>
     <Authors>Joery Droppers</Authors>
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
     <PackageReadmeFile>NuGet.md</PackageReadmeFile>
 
     <PackageOutputDir>../../nupkg/</PackageOutputDir>

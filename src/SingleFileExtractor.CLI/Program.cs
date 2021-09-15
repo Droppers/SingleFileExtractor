@@ -39,6 +39,11 @@ static void RunExtractor(string fileName, string outputDirectory)
     try
     {
         var result = BundleExtractor.Extract(fileName, outputDirectory);
+        if (result.StartupInfo.EntryPoint != null)
+        {
+            Console.WriteLine($"Entry point: {result.StartupInfo.EntryPoint}");
+        }
+
         Console.WriteLine($"Bundle version: {result.MajorVersion}.{result.MinorVersion}");
         Console.WriteLine($"Extracted {result.Files.Count} files to \"{outputDirectory}\"");
     }
