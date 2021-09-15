@@ -18,7 +18,7 @@ dotnet tool install -g sfextract
 # Usage
 ## Command-line
 ```
-sfextract [file] --output|-o [directory]
+sfextract [file] -o|--output [directory]
 ```
 
 <b>Example</b><br>
