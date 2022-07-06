@@ -1,5 +1,8 @@
-﻿namespace SingleFileExtractor.Core
+﻿using JetBrains.Annotations;
+
+namespace SingleFileExtractor.Core
 {
+    [PublicAPI]
     public enum FileType : byte
     {
         Unknown, // Type not determined.

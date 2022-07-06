@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using Xunit;
 
 namespace SingleFileExtractor.Core.Tests
@@ -23,6 +24,19 @@ namespace SingleFileExtractor.Core.Tests
 
             Assert.Equal(expectedEntryPointPath, startupInfo.EntryPoint);
         }
+
+        [Fact]
+        public void Read_And_ExtractSpecificFile()
+        {
+            const string fileName = "output/Compression.dll";
+
+            var manifest = new ExecutableReader().ReadManifest(GetPath("Compression.exe"));
+            var file = manifest.Files.Single(x => x.RelativePath == "Compression.dll");
+            file.Extract(fileName);
+
+            Assert.True(File.Exists(fileName));
+        }
+
 
         private static string GetPath(string name) => Path.Combine(AppContext.BaseDirectory, "TestFiles", name);
     }

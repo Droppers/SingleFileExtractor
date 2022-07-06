@@ -5,6 +5,17 @@ This is a library to programmatically extract the contents (assemblies, symbols,
 Install the `SingleFileExtractor.Core` NuGet package for your project.
 
 # Usage
+
+## Extract all files
+
 ```csharp
 BundleExtractor.Extract("Application.exe", "path/to/output");
+```
+
+## Extract specific file
+
+```csharp
+var manifest = new ExecutableReader().Read("Application.exe");
+var file = manifest.Files.Single(x => x.RelativePath == "Example.dll");
+file.Extract(""Example.dll); // or file.AsStream()
 ```

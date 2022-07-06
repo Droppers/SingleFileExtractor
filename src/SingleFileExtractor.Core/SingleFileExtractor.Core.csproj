@@ -16,7 +16,7 @@
     <PackageDescription>A library to programmatically extract the contents of a single file application to a directory.</PackageDescription>
     <PackageTags>single-file;executable;extractor</PackageTags>
     <Authors>Joery Droppers</Authors>
-    <Version>1.0.1</Version>
+    <Version>1.1.0</Version>
     <PackageReadmeFile>NuGet.md</PackageReadmeFile>
 
     <PackageOutputDir>../../nupkg/</PackageOutputDir>
@@ -28,6 +28,10 @@
 
   <ItemGroup>
     <None Include="NuGet.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="JetBrains.Annotations" Version="2022.1.0" />
   </ItemGroup>
 
 

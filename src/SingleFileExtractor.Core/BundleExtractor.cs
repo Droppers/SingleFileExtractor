@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.IO.MemoryMappedFiles;
+using JetBrains.Annotations;
+using SingleFileExtractor.Core.Helpers;
 
 namespace SingleFileExtractor.Core
 {
@@ -10,13 +12,16 @@ namespace SingleFileExtractor.Core
     {
         private readonly IExecutableReader _executableReader;
 
+        [PublicAPI]
         public BundleExtractor() : this(new ExecutableReader()) { }
 
+        [PublicAPI]
         public BundleExtractor(IExecutableReader executableReader)
         {
             _executableReader = executableReader;
         }
 
+        [PublicAPI]
         public Manifest ExtractToDirectory(string fileName, string outputDirectory)
         {
             if (!File.Exists(fileName))
@@ -25,17 +30,9 @@ namespace SingleFileExtractor.Core
                 throw new FileNotFoundException("Path to single file executable does not exist.", fileName);
             }
 
-            using var memoryMappedFile =
-                MemoryMappedFile.CreateFromFile(fileName, FileMode.Open, null, 0, MemoryMappedFileAccess.Read);
-            using var accessor =
-                memoryMappedFile.CreateViewAccessor(0, 0, MemoryMappedFileAccess.Read);
 
-            return ExtractToDirectory(accessor, outputDirectory);
-        }
-
-        public Manifest ExtractToDirectory(MemoryMappedViewAccessor viewAccessor, string outputDirectory)
-        {
-            var manifest = _executableReader.ReadManifest(viewAccessor);
+            var manifest = _executableReader.ReadManifest(fileName);
+            using var accessor = MemoryMappedFileHelper.CreateViewAccessor(fileName);
 
             // Maintain a list of extracted files to be able to remove them if extraction fails
             var fileNames = new List<string>();
@@ -46,7 +43,7 @@ namespace SingleFileExtractor.Core
                     var targetFileName = Path.Combine(outputDirectory, file.RelativePath);
                     fileNames.Add(targetFileName);
 
-                    ExtractToFile(viewAccessor, targetFileName, file);
+                    ExtractToFile(accessor, targetFileName, file);
                 }
             }
             catch
@@ -58,10 +55,11 @@ namespace SingleFileExtractor.Core
             return manifest;
         }
 
+        [PublicAPI]
         public static Manifest Extract(string fileName, string outputDirectory) =>
             new BundleExtractor().ExtractToDirectory(fileName, outputDirectory);
 
-        private static void ExtractToFile(MemoryMappedViewAccessor viewAccessor, string targetFileName, FileEntry file)
+        internal static void ExtractToFile(MemoryMappedViewAccessor viewAccessor, string targetFileName, FileEntry file)
         {
             Directory.CreateDirectory(Path.GetDirectoryName(targetFileName)!);
             using var destination = File.OpenWrite(targetFileName);

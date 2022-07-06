@@ -28,33 +28,21 @@ namespace SingleFileExtractor.Core
 
         public Manifest ReadManifest(string fileName)
         {
-            using var memoryMappedFile =
-                MemoryMappedFile.CreateFromFile(fileName, FileMode.Open, null, 0, MemoryMappedFileAccess.Read);
-            using var accessor =
-                memoryMappedFile.CreateViewAccessor(0, 0, MemoryMappedFileAccess.Read);
+            using var accessor = MemoryMappedFileHelper.CreateViewAccessor(fileName);
 
-            return ReadManifest(accessor);
-        }
-
-        public Manifest ReadManifest(MemoryMappedViewAccessor viewAccessor)
-        {
-            var startupInfo = ReadStartupInfo(viewAccessor);
-            return Read(viewAccessor, startupInfo);
+            var startupInfo = ReadStartupInfo(accessor);
+            return Read(fileName, accessor, startupInfo);
         }
 
         public StartupInfo ReadStartupInfo(string fileName)
         {
-            using var memoryMappedFile =
-                MemoryMappedFile.CreateFromFile(fileName, FileMode.Open, null, 0, MemoryMappedFileAccess.Read);
-            using var accessor =
-                memoryMappedFile.CreateViewAccessor(0, 0, MemoryMappedFileAccess.Read);
-
+            using var accessor = MemoryMappedFileHelper.CreateViewAccessor(fileName);
             return ReadStartupInfo(accessor);
         }
 
         // A fast method of locating the bundle signature using KMP search
         // https://github.com/dotnet/runtime/blob/84de9b678613675e0444b265905c82d33dae33a8/src/installer/managed/Microsoft.NET.HostModel/AppHost/HostWriter.cs
-        public StartupInfo ReadStartupInfo(MemoryMappedViewAccessor viewAccessor)
+        private static StartupInfo ReadStartupInfo(MemoryMappedViewAccessor viewAccessor)
         {
             var position = BinaryKmpSearch.SearchInFile(viewAccessor, BundleSignature);
             if (position == -1)
@@ -67,7 +55,7 @@ namespace SingleFileExtractor.Core
             return new StartupInfo(entryPointPath, manifestOffset);
         }
 
-        private static Manifest Read(MemoryMappedViewAccessor viewAccessor, StartupInfo startupInfo)
+        private static Manifest Read(string fileName, MemoryMappedViewAccessor viewAccessor, StartupInfo startupInfo)
         {
             if (startupInfo.ManifestOffset == 0)
             {
@@ -96,7 +84,7 @@ namespace SingleFileExtractor.Core
             var files = new List<FileEntry>();
             for (var i = 0; i < fileCount; i++)
             {
-                files.Add(FileEntry.FromBinaryReader(br, majorVersion));
+                files.Add(FileEntry.FromBinaryReader(br, majorVersion, fileName));
             }
 
             return new Manifest(startupInfo, (int)majorVersion, (int)minorVersion, bundleHash, files);
