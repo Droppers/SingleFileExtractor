@@ -8,14 +8,14 @@ Install the `SingleFileExtractor.Core` NuGet package for your project.
 
 ## Extract all files
 
-```csharp
+```cs
 BundleExtractor.Extract("Application.exe", "path/to/output");
 ```
 
 ## Extract specific file
 
-```csharp
+```cs
 var manifest = new ExecutableReader().Read("Application.exe");
 var file = manifest.Files.Single(x => x.RelativePath == "Example.dll");
-file.Extract(""Example.dll); // or file.AsStream()
+file.Extract("Example.dll"); // or file.AsStream()
 ```
