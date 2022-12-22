@@ -1,129 +1,154 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.MemoryMappedFiles;
-using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using JetBrains.Annotations;
 using SingleFileExtractor.Core.Exceptions;
 using SingleFileExtractor.Core.Helpers;
 
 namespace SingleFileExtractor.Core
 {
-    public class ExecutableReader : IExecutableReader
+    public class ExecutableReader : IDisposable
     {
-        private static readonly int[] KnownEntryPointPathOffsets =
+        private StartupInfo? _startupInfo;
+        private Bundle? _manifest;
+        private bool _isSupported;
+        
+        [PublicAPI]
+        public ExecutableReader(string fileName)
         {
-            56, // 6.0
-            48, 64, // 5.0
-            200 // 3.x
-        };
-
-
-        private static readonly byte[] BundleSignature =
-        {
-            // 32 bytes represent the bundle signature: SHA-256 for ".net core bundle"
-            0x8b, 0x12, 0x02, 0xb9, 0x6a, 0x61, 0x20, 0x38,
-            0x72, 0x7b, 0x93, 0x02, 0x14, 0xd7, 0xa0, 0x32,
-            0x13, 0xf5, 0xb9, 0xe6, 0xef, 0xae, 0x33, 0x18,
-            0xee, 0x3b, 0x2d, 0xce, 0x24, 0xb3, 0x6a, 0xae
-        };
-
-        public Manifest ReadManifest(string fileName)
-        {
-            using var accessor = MemoryMappedFileHelper.CreateViewAccessor(fileName);
-
-            var startupInfo = ReadStartupInfo(accessor);
-            return Read(fileName, accessor, startupInfo);
-        }
-
-        public StartupInfo ReadStartupInfo(string fileName)
-        {
-            using var accessor = MemoryMappedFileHelper.CreateViewAccessor(fileName);
-            return ReadStartupInfo(accessor);
-        }
-
-        // A fast method of locating the bundle signature using KMP search
-        // https://github.com/dotnet/runtime/blob/84de9b678613675e0444b265905c82d33dae33a8/src/installer/managed/Microsoft.NET.HostModel/AppHost/HostWriter.cs
-        private static StartupInfo ReadStartupInfo(MemoryMappedViewAccessor viewAccessor)
-        {
-            var position = BinaryKmpSearch.SearchInFile(viewAccessor, BundleSignature);
-            if (position == -1)
+            if (!File.Exists(fileName))
             {
-                throw new UnsupportedExecutableException("Is not a .NET Core 3.x, 5.0 or 6.0 executable.");
+                throw new FileNotFoundException("Path to single file executable does not exist.", fileName);
             }
 
-            var entryPointPath = ReadEntryPoint(viewAccessor, position + BundleSignature.Length);
-            var manifestOffset = viewAccessor.ReadInt64(position - sizeof(long));
-            return new StartupInfo(entryPointPath, manifestOffset);
+
+            FileName = fileName;
+            ViewAccessor = MemoryMappedFileHelper.CreateViewAccessor(fileName);
         }
 
-        private static Manifest Read(string fileName, MemoryMappedViewAccessor viewAccessor, StartupInfo startupInfo)
+        internal MemoryMappedViewAccessor ViewAccessor { get; }
+        
+        [PublicAPI]
+        public string FileName { get; }
+        
+        [PublicAPI]
+        public bool IsSupported
         {
-            if (startupInfo.ManifestOffset == 0)
+            get
             {
-                throw new UnsupportedExecutableException("Only single file executables can be extracted.");
+                ReadStartupInfo();
+                return _isSupported;
             }
-
-            var stream = new UnmanagedMemoryStream(viewAccessor.SafeMemoryMappedViewHandle, startupInfo.ManifestOffset,
-                viewAccessor.Capacity - startupInfo.ManifestOffset);
-            using var br = new BinaryReader(stream, Encoding.ASCII);
-
-            var majorVersion = br.ReadUInt32();
-            var minorVersion = br.ReadUInt32();
-            var fileCount = br.ReadInt32();
-            var bundleHash = br.ReadString();
-
-            if (majorVersion >= 2)
-            {
-                // We can skip these? They are included in file entries anyways.
-                br.ReadInt64(); // depsOffset
-                br.ReadInt64(); // depsSize
-                br.ReadInt64(); // runtimeConfigOffset
-                br.ReadInt64(); // runtimeConfigSize
-                br.ReadUInt64(); // flags
-            }
-
-            var files = new List<FileEntry>();
-            for (var i = 0; i < fileCount; i++)
-            {
-                files.Add(FileEntry.FromBinaryReader(br, majorVersion, fileName));
-            }
-
-            return new Manifest(startupInfo, (int)majorVersion, (int)minorVersion, bundleHash, files);
         }
 
-        // Extremely janky method for finding the relative path to the entry point managed DLL
-        // Why? It saves me a lot of time
-        private static string? ReadEntryPoint(MemoryMappedViewAccessor viewAccessor, long startOffset)
+        [PublicAPI]
+        public StartupInfo StartupInfo => ReadStartupInfo() ?? throw new UnsupportedExecutableException("Is not a .NET Core 3.x, 5.0 or 6.0 executable.");
+
+        [PublicAPI]
+        public bool IsSingleFile => StartupInfo.IsSingleFile;
+        
+        [PublicAPI]
+        public Bundle Bundle => _manifest ??= BundleReader.Read(this, StartupInfo);
+
+        [PublicAPI]
+        public void ExtractToDirectory(string outputDirectory)
         {
-            foreach (var entryPointOffset in KnownEntryPointPathOffsets)
+            GuardAgainstNotSingleFile();
+            
+            // Maintain a list of extracted files to be able to remove them if extraction fails
+            var fileNames = new List<string>();
+            try
             {
-                // Check if it is the start of a sequence of ASCII characters
-                var previousByte = viewAccessor.ReadByte(startOffset + entryPointOffset - 1);
-                var firstByte = viewAccessor.ReadByte(startOffset + entryPointOffset);
-                if (firstByte < 32 || firstByte > 126 || previousByte != 0)
+                foreach (var file in Bundle.Files)
+                {
+                    var targetFileName = Path.Combine(outputDirectory, file.RelativePath);
+                    fileNames.Add(targetFileName);
+
+                    file.ExtractToFile(targetFileName);
+                }
+            }
+            catch
+            {
+                CleanupFiles(fileNames);
+                throw;
+            }
+        }
+
+        [PublicAPI]
+        public async Task ExtractToDirectoryAsync(string outputDirectory, CancellationToken cancellationToken = default)
+        {
+            GuardAgainstNotSingleFile();
+            
+            // Maintain a list of extracted files to be able to remove them if extraction fails
+            var extractedFileNames = new List<string>();
+            try
+            {
+                foreach (var file in Bundle.Files)
+                {
+                    var targetFileName = Path.Combine(outputDirectory, file.RelativePath);
+                    extractedFileNames.Add(targetFileName);
+
+                    await file.ExtractToFileAsync(targetFileName, cancellationToken);
+                }
+            }
+            catch
+            {
+                CleanupFiles(extractedFileNames);
+                throw;
+            }
+        }
+        
+        private StartupInfo? ReadStartupInfo()
+        {
+            if (_startupInfo is not null)
+            {
+                return _startupInfo;
+            }
+            
+            if (BundleReader.TryReadStartupInfo(this, out var startupInfo))
+            {
+                _isSupported = true;
+                return _startupInfo = startupInfo;
+            }
+
+            _isSupported = false;
+            return null;
+        }
+
+        private void GuardAgainstNotSingleFile()
+        {
+            if (!IsSingleFile)
+            {
+                throw new InvalidOperationException("Only single file executables can be extracted.");
+            }
+        }
+        
+        private static void CleanupFiles(IEnumerable<string> fileNames)
+        {
+            foreach (var fileName in fileNames)
+            {
+                if (!File.Exists(fileName))
                 {
                     continue;
                 }
 
-                startOffset += entryPointOffset;
-
-                var buffer = new byte[1024]; // Max file path is 1024 chars
-                var index = 0;
-                while (true)
+                try
                 {
-                    var character = viewAccessor.ReadByte(startOffset + index);
-                    if (character == 0)
-                    {
-                        break;
-                    }
-
-                    buffer[index] = character;
-                    index++;
+                    File.Delete(fileName);
                 }
-
-                return Encoding.ASCII.GetString(buffer, 0, index);
+                catch
+                {
+                    // ignored
+                }
             }
-
-            return null;
+        }
+        
+        public void Dispose()
+        {
+            ViewAccessor.Dispose();
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using JetBrains.Annotations;
 
-namespace SingleFileExtractor.Core
+namespace SingleFileExtractor.Core.Legacy
 {
     [PublicAPI]
     public record Manifest(

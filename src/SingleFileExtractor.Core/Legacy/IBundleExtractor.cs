@@ -1,6 +1,4 @@
-﻿using System.IO.MemoryMappedFiles;
-
-namespace SingleFileExtractor.Core
+﻿namespace SingleFileExtractor.Core.Legacy
 {
     public interface IBundleExtractor
     {

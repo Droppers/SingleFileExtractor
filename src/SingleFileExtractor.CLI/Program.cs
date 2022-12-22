@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using McMaster.Extensions.CommandLineUtils;
 using SingleFileExtractor.Core;
 using SingleFileExtractor.Core.Exceptions;
@@ -11,11 +13,11 @@ var fileOption = app.Argument("executable", "The single file executable to be ex
 var outputOption = app.Option("-o|--output <DIRECTORY>", "The directory to write the extracted files to.",
     CommandOptionType.SingleValue).IsRequired();
 
-app.OnExecute(() =>
+app.OnExecuteAsync(async (cancellationToken) =>
 {
     if (fileOption.Value != null && outputOption.Value() != null)
     {
-        RunExtractor(fileOption.Value, outputOption.Value()!);
+        await RunExtractorAsync(fileOption.Value, outputOption.Value()!, cancellationToken);
     }
     else
     {
@@ -32,20 +34,38 @@ app.OnValidationError(error =>
     Console.ResetColor();
 });
 
-return app.Execute(args);
+return await app.ExecuteAsync(args);
 
-static void RunExtractor(string fileName, string outputDirectory)
+static async Task RunExtractorAsync(string fileName, string outputDirectory, CancellationToken cancellationToken)
 {
     try
     {
-        var result = BundleExtractor.Extract(fileName, outputDirectory);
-        if (result.StartupInfo.EntryPoint != null)
+        var reader = new ExecutableReader(fileName);
+        if (!reader.IsSupported)
         {
-            Console.WriteLine($"Entry point: {result.StartupInfo.EntryPoint}");
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine("Is not a .NET Core 3.x, 5.0 or 6.0 executable.");
+            Console.ResetColor();
+            return;
+        }
+        
+        if (reader.StartupInfo.EntryPoint is not null)
+        {
+            Console.WriteLine($"Entry point: {reader.StartupInfo.EntryPoint}");
         }
 
-        Console.WriteLine($"Bundle version: {result.MajorVersion}.{result.MinorVersion}");
-        Console.WriteLine($"Extracted {result.Files.Count} files to \"{outputDirectory}\"");
+        if (!reader.IsSingleFile)
+        {
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine("Executable is not a single file executable");
+            Console.ResetColor();
+            return;
+        }
+
+        Console.WriteLine($"Bundle version: {reader.Bundle.MajorVersion}.{reader.Bundle.MinorVersion}");
+
+        await reader.ExtractToDirectoryAsync(outputDirectory, cancellationToken);
+        Console.WriteLine($"Extracted {reader.Bundle.Files.Count} files to \"{outputDirectory}\"");
     }
     catch (Exception e) when (e is FileNotFoundException or UnsupportedExecutableException)
     {

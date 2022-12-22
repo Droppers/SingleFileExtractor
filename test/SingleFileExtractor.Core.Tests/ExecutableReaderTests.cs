@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using SingleFileExtractor.Core.Exceptions;
 using Xunit;
 
 namespace SingleFileExtractor.Core.Tests
@@ -13,15 +14,13 @@ namespace SingleFileExtractor.Core.Tests
         [InlineData("dnSpy.Console.exe", @"bin\dnSpy.Console.dll")]
         [InlineData("Console31.exe", "Console31.dll")]
         [InlineData("Compression.exe", "Compression.dll")]
-        [InlineData("NoCompression.exe", "Compression.dll")] // Same project but with compression disabled oops
+        [InlineData("NoCompression.exe", "Compression.dll")] // Same project but with compression disabled
         [InlineData("RoslynPad.exe", "RoslynPad.dll")]
         [InlineData("DotNetPad.exe", "DotNetPad.dll")]
         [InlineData("LINQPad6.exe", "LINQPad.GUI.dll")]
         public void StartupInfoTests(string executable, string expectedEntryPointPath)
         {
-            var reader = new ExecutableReader();
-            var startupInfo = reader.ReadStartupInfo(GetPath(executable));
-
+            var startupInfo = new ExecutableReader(GetPath(executable)).StartupInfo;
             Assert.Equal(expectedEntryPointPath, startupInfo.EntryPoint);
         }
 
@@ -30,14 +29,47 @@ namespace SingleFileExtractor.Core.Tests
         {
             const string fileName = "output/Compression.dll";
 
-            var manifest = new ExecutableReader().ReadManifest(GetPath("Compression.exe"));
-            var file = manifest.Files.Single(x => x.RelativePath == "Compression.dll");
-            file.Extract(fileName);
+            var bundle = new ExecutableReader(GetPath("Compression.exe")).Bundle;
+            var file = bundle.Files.Single(x => x.RelativePath == "Compression.dll");
+            file.ExtractToFile(fileName);
 
             Assert.True(File.Exists(fileName));
         }
 
+        [Fact]
+        public void Extract_NotBundle()
+        {
+            Assert.Throws<InvalidOperationException>(() =>
+            {
+                new ExecutableReader(GetPath("paintdotnet.exe")).ExtractToDirectory("output/paintdotnet");
+            });
+        }
 
+        [Fact]
+        public void Extract_NotDotNetCore()
+        {
+            Assert.Throws<UnsupportedExecutableException>(() =>
+            {
+                new ExecutableReader(GetPath("ShareX.exe")).ExtractToDirectory("output/sharex");
+            });
+        }
+        
+        [Fact]
+        public void Extract_WithCompression()
+        {
+            var bundle = new ExecutableReader(GetPath("Compression.exe"));
+            bundle.ExtractToDirectory("output/compression");
+            Assert.Equal("Compression.dll", bundle.StartupInfo.EntryPoint);
+        }
+
+        [Fact]
+        public void Extract_WithoutCompression()
+        {
+            var bundle = new ExecutableReader(GetPath("NoCompression.exe"));
+            bundle.ExtractToDirectory("output/no-compression");
+            Assert.Equal("Compression.dll", bundle.StartupInfo.EntryPoint);
+        }
+        
         private static string GetPath(string name) => Path.Combine(AppContext.BaseDirectory, "TestFiles", name);
     }
 }

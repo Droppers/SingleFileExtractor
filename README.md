@@ -30,7 +30,29 @@ sfextract Application.exe -o path/to/output/
 
 Install the `SingleFileExtractor.Core` NuGet package to use it programmatically:
 ```csharp
-BundleExtractor.Extract("application.exe", "path/to/output/");
+var reader = new ExecutableReader("application.exe");
+```
+
+**.NET Core executables**
+```csharp
+var startupInfo = reader.StartupInfo;
+```
+
+**Single file executables**
+```csharp
+// Validate if executable is a single file executable, and can be extracted
+var isSingleFile = reader.IsSingleFile;
+
+if (isSingleFile)
+{
+    // Extract specific file entry
+    await reader.Manifest.Entries[0].ExtractToFileAsync("example.dll");
+    // , or create an in-memory stream of a specifc file entry
+    var stream = await reader.Manifest.Entries[0].AsStreamAsync()
+    
+    // Extract all files to a directory
+    await reader.ExtractToDirectoryAsync("path/to/output");
+}
 ```
 
 ## Why

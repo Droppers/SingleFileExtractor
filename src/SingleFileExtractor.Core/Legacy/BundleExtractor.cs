@@ -6,7 +6,7 @@ using System.IO.MemoryMappedFiles;
 using JetBrains.Annotations;
 using SingleFileExtractor.Core.Helpers;
 
-namespace SingleFileExtractor.Core
+namespace SingleFileExtractor.Core.Legacy
 {
     public class BundleExtractor : IBundleExtractor
     {

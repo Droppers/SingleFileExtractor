@@ -7,9 +7,9 @@ namespace SingleFileExtractor.Core
     {
         Unknown, // Type not determined.
         Assembly, // IL and R2R Assemblies
-        NativeBinary, // NativeBinaries
-        DepsJson, // .deps.json configuration file
-        RuntimeConfigJson, // .runtimeconfig.json configuration file
-        Symbols // PDB Files
+        NativeBinary, // Native binaries
+        DepsJson, // deps.json configuration file
+        RuntimeConfigJson, // runtimeconfig.json configuration file
+        Symbols // Symbol (PDB) files
     }
 }

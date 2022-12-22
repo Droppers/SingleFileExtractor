@@ -4,7 +4,8 @@
     <TargetFramework>netstandard2.1</TargetFramework>
     <DisableImplicitNamespaceImports>true</DisableImplicitNamespaceImports>
     <Nullable>enable</Nullable>
-    <LangVersion>9.0</LangVersion>
+    <LangVersion>10.0</LangVersion>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -16,7 +17,7 @@
     <PackageDescription>A library to programmatically extract the contents of a single file application to a directory.</PackageDescription>
     <PackageTags>single-file;executable;extractor</PackageTags>
     <Authors>Joery Droppers</Authors>
-    <Version>1.1.0</Version>
+    <Version>2.0.0</Version>
     <PackageReadmeFile>NuGet.md</PackageReadmeFile>
 
     <PackageOutputDir>../../nupkg/</PackageOutputDir>
@@ -33,14 +34,5 @@
   <ItemGroup>
     <PackageReference Include="JetBrains.Annotations" Version="2022.1.0" />
   </ItemGroup>
-
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
 
 </Project>
