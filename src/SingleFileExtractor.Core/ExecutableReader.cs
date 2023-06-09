@@ -13,9 +13,9 @@ namespace SingleFileExtractor.Core
     public class ExecutableReader : IDisposable
     {
         private StartupInfo? _startupInfo;
-        private Bundle? _manifest;
+        private Bundle? _bundle;
         private bool _isSupported;
-        
+
         [PublicAPI]
         public ExecutableReader(string fileName)
         {
@@ -51,7 +51,7 @@ namespace SingleFileExtractor.Core
         public bool IsSingleFile => StartupInfo.IsSingleFile;
         
         [PublicAPI]
-        public Bundle Bundle => _manifest ??= BundleReader.Read(this, StartupInfo);
+        public Bundle Bundle => _bundle ??= Bundle.FromExecutableReader(this);
 
         [PublicAPI]
         public void ExtractToDirectory(string outputDirectory)
@@ -125,7 +125,7 @@ namespace SingleFileExtractor.Core
                 throw new InvalidOperationException("Only single file executables can be extracted.");
             }
         }
-        
+
         private static void CleanupFiles(IEnumerable<string> fileNames)
         {
             foreach (var fileName in fileNames)

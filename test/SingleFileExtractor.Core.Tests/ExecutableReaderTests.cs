@@ -69,7 +69,7 @@ namespace SingleFileExtractor.Core.Tests
             bundle.ExtractToDirectory("output/no-compression");
             Assert.Equal("Compression.dll", bundle.StartupInfo.EntryPoint);
         }
-        
+
         private static string GetPath(string name) => Path.Combine(AppContext.BaseDirectory, "TestFiles", name);
     }
 }

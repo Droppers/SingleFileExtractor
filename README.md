@@ -33,13 +33,20 @@ Install the `SingleFileExtractor.Core` NuGet package to use it programmatically:
 var reader = new ExecutableReader("application.exe");
 ```
 
-**.NET Core executables**
-```csharp
+### Read startup info
+
+When you want to know what the entry point assembly is, you can read the startup info
+
+```cs
+var reader = new ExecutableReader("application.exe");
 var startupInfo = reader.StartupInfo;
 ```
 
-**Single file executables**
-```csharp
+### Extract all files
+
+```cs
+var reader = new ExecutableReader("application.exe");
+
 // Validate if executable is a single file executable, and can be extracted
 var isSingleFile = reader.IsSingleFile;
 
@@ -53,6 +60,20 @@ if (isSingleFile)
     // Extract all files to a directory
     await reader.ExtractToDirectoryAsync("path/to/output");
 }
+```
+
+### Extract specific entry to file
+
+```cs
+var reader = new ExecutableReader("application.exe");
+await reader.Manifest.Entries[0].ExtractToFileAsync("example.dll");
+```
+
+### Extract specific entry to stream
+
+```cs
+var reader = new ExecutableReader("application.exe");
+var stream = await reader.Manifest.Entries[0].AsStreamAsync()
 ```
 
 ## Why

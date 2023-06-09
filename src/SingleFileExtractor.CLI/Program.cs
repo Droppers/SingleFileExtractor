@@ -48,7 +48,7 @@ static async Task RunExtractorAsync(string fileName, string outputDirectory, Can
             Console.ResetColor();
             return;
         }
-        
+
         if (reader.StartupInfo.EntryPoint is not null)
         {
             Console.WriteLine($"Entry point: {reader.StartupInfo.EntryPoint}");
@@ -57,7 +57,8 @@ static async Task RunExtractorAsync(string fileName, string outputDirectory, Can
         if (!reader.IsSingleFile)
         {
             Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("Executable is not a single file executable");
+            Console.WriteLine(
+                "Executable is not a single file executable, note that assembly files (*.dll) are not executables.");
             Console.ResetColor();
             return;
         }

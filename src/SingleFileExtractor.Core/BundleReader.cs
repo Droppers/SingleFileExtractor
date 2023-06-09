@@ -42,41 +42,6 @@ namespace SingleFileExtractor.Core
             return true;
         }
 
-        public static Bundle Read(ExecutableReader executableReader, StartupInfo startupInfo)
-        {
-            if (startupInfo.ManifestOffset == 0)
-            {
-                throw new InvalidOperationException("Only single file executables can be extracted.");
-            }
-
-            var stream = new UnmanagedMemoryStream(executableReader.ViewAccessor.SafeMemoryMappedViewHandle, startupInfo.ManifestOffset,
-                executableReader.ViewAccessor.Capacity - startupInfo.ManifestOffset);
-            using var br = new BinaryReader(stream, Encoding.ASCII);
-
-            var majorVersion = br.ReadUInt32();
-            var minorVersion = br.ReadUInt32();
-            var fileCount = br.ReadInt32();
-            var bundleHash = br.ReadString();
-
-            if (majorVersion >= 2)
-            {
-                // We can skip these? They are included in file entries anyways.
-                br.ReadInt64(); // depsOffset
-                br.ReadInt64(); // depsSize
-                br.ReadInt64(); // runtimeConfigOffset
-                br.ReadInt64(); // runtimeConfigSize
-                br.ReadUInt64(); // flags
-            }
-
-            var files = new FileEntry[fileCount];
-            for (var i = 0; i < fileCount; i++)
-            {
-                files[i] = FileEntry.FromBinaryReader(executableReader, br, majorVersion);
-            }
-
-            return new Bundle((int)majorVersion, (int)minorVersion, bundleHash, files);
-        }
-
         // Extremely janky method for finding the relative path to the entry point managed DLL
         // Why? It saves me a lot of time
         private static unsafe string? ReadEntryPoint(UnmanagedMemoryAccessor memoryAccessor, long startOffset)
