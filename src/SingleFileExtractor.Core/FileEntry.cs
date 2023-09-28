@@ -120,7 +120,7 @@ namespace SingleFileExtractor.Core
             // The entire filename is invalid, generate a new one so that subsequent extractions do not overwrite the same file
             if (Path.GetFileNameWithoutExtension(filteredFileName).Replace("_", String.Empty).Length == 0)
             {
-                System.Console.WriteLine(normalized, "is an invalid filename, replacing with random name");
+                System.Console.WriteLine(normalized + " is an invalid filename, replacing with random name");
                 filteredFileName = "invalid_" + Guid.NewGuid().ToString() + Path.GetExtension(filteredFileName);
             }
 
