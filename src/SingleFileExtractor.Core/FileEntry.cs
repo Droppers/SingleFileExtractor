@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.IO.Compression;
 using System.Runtime.CompilerServices;
@@ -107,8 +108,24 @@ namespace SingleFileExtractor.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static Stream OpenDestinationStream(string fileName)
         {
-            Directory.CreateDirectory(Path.GetDirectoryName(fileName)!);
-            return File.OpenWrite(fileName);            
+            string normalized = fileName.Normalize();
+            string dir = Path.GetDirectoryName(normalized)!;
+            string filteredFileName = Path.GetFileName(normalized);
+
+            foreach (char c in System.IO.Path.GetInvalidFileNameChars())
+            {
+                filteredFileName = filteredFileName.Replace(c, '_');
+            }
+
+            // The entire filename is invalid, generate a new one so that subsequent extractions do not overwrite the same file
+            if (Path.GetFileNameWithoutExtension(filteredFileName).Replace("_", String.Empty).Length == 0)
+            {
+                System.Console.WriteLine(normalized, "is an invalid filename, replacing with random name");
+                filteredFileName = "invalid_" + Guid.NewGuid().ToString() + Path.GetExtension(filteredFileName);
+            }
+
+            Directory.CreateDirectory(dir);
+            return File.OpenWrite(Path.Combine(dir, filteredFileName));            
         }
     }
 }
