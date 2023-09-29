@@ -72,7 +72,7 @@ namespace SingleFileExtractor.Core
                     index++;
                 }
 
-                return Encoding.ASCII.GetString(buffer[..index]);
+                return Encoding.UTF8.GetString(buffer[..index]);
             }
 
             return null;

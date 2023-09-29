@@ -64,7 +64,7 @@ namespace SingleFileExtractor.Core.Legacy
 
             var stream = new UnmanagedMemoryStream(viewAccessor.SafeMemoryMappedViewHandle, startupInfo.ManifestOffset,
                 viewAccessor.Capacity - startupInfo.ManifestOffset);
-            using var br = new BinaryReader(stream, Encoding.ASCII);
+            using var br = new BinaryReader(stream, Encoding.UTF8);
 
             var majorVersion = br.ReadUInt32();
             var minorVersion = br.ReadUInt32();

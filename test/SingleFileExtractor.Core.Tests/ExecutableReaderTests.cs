@@ -70,6 +70,15 @@ namespace SingleFileExtractor.Core.Tests
             Assert.Equal("Compression.dll", bundle.StartupInfo.EntryPoint);
         }
 
+        [Fact]
+        public void Extract_Utf8Encoding()
+        {
+            var bundle = new ExecutableReader(GetPath("FunkyCharacters.exe"));
+            bundle.ExtractToDirectory("output/funky-characters");
+            Assert.Equal("FunkyCharacters.dll", bundle.StartupInfo.EntryPoint);
+            Assert.Equal(1, bundle.Bundle.Files.Count(a => a.RelativePath == "えのさにへひいけくはわもむもてむけものりら.dll"));
+        }
+
         private static string GetPath(string name) => Path.Combine(AppContext.BaseDirectory, "TestFiles", name);
     }
 }
