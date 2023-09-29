@@ -13,7 +13,13 @@ After installation, the tool can be called by using the `sfextract` command usin
 sfextract [file] -o|--output [output-directory]
 ```
 
-# Example
+## Extract files
 ```
-sfextract MyApplication.exe -o output/
+sfextract Application.exe -o path/to/output/
+```
+
+## List files
+Omitting the output directory will list all files in the single file executable.
+```
+sfextract Application.exe
 ```
