@@ -21,9 +21,15 @@ dotnet tool install -g sfextract
 sfextract [file] -o|--output [directory]
 ```
 
-<b>Example</b><br>
+<b>Extract files</b><br>
 ```
 sfextract Application.exe -o path/to/output/
+```
+
+<b>List files</b><br>
+Omitting the output directory will list all files in the single file executable.
+```
+sfextract Application.exe
 ```
 
 ## Programmatically

@@ -10,14 +10,14 @@ var app = new CommandLineApplication();
 app.HelpOption();
 
 var fileOption = app.Argument("executable", "The single file executable to be extracted").IsRequired();
-var outputOption = app.Option("-o|--output <DIRECTORY>", "The directory to write the extracted files to.",
-    CommandOptionType.SingleValue).IsRequired();
+var outputOption = app.Option("-o|--output <DIRECTORY>", "(optional) The directory to write the extracted files to. Omit this option to only list the files.",
+    CommandOptionType.SingleValue);
 
-app.OnExecuteAsync(async (cancellationToken) =>
+app.OnExecuteAsync(async cancellationToken =>
 {
-    if (fileOption.Value != null && outputOption.Value() != null)
+    if (fileOption.Value != null)
     {
-        await RunExtractorAsync(fileOption.Value, outputOption.Value()!, cancellationToken);
+        await RunExtractorAsync(fileOption.Value, outputOption.Value(), cancellationToken);
     }
     else
     {
@@ -36,7 +36,7 @@ app.OnValidationError(error =>
 
 return await app.ExecuteAsync(args);
 
-static async Task RunExtractorAsync(string fileName, string outputDirectory, CancellationToken cancellationToken)
+static async Task RunExtractorAsync(string fileName, string? outputDirectory, CancellationToken cancellationToken)
 {
     try
     {
@@ -65,8 +65,20 @@ static async Task RunExtractorAsync(string fileName, string outputDirectory, Can
 
         Console.WriteLine($"Bundle version: {reader.Bundle.MajorVersion}.{reader.Bundle.MinorVersion}");
 
-        await reader.ExtractToDirectoryAsync(outputDirectory, cancellationToken);
-        Console.WriteLine($"Extracted {reader.Bundle.Files.Count} files to \"{outputDirectory}\"");
+        if (outputDirectory is null)
+        {
+            Console.WriteLine($"Contains {reader.Bundle.Files.Count} files:");
+            
+            foreach (var file in reader.Bundle.Files)
+            {
+                Console.WriteLine($" - {file.RelativePath} ({HumanizeFileSize(file.Size)}, {file.Size} bytes)");
+            }
+        }
+        else
+        {
+            await reader.ExtractToDirectoryAsync(outputDirectory, cancellationToken);
+            Console.WriteLine($"Extracted {reader.Bundle.Files.Count} files to \"{outputDirectory}\"");
+        }
     }
     catch (Exception e) when (e is FileNotFoundException or UnsupportedExecutableException)
     {
@@ -77,4 +89,17 @@ static async Task RunExtractorAsync(string fileName, string outputDirectory, Can
         Console.WriteLine("Unexpected error while extracting:");
         Console.WriteLine(e);
     }
+}
+
+static string HumanizeFileSize(long size)
+{
+    var sizes = new[] { "B", "KB", "MB", "GB", "TB" };
+    var order = 0;
+    while (size >= 1024 && order < sizes.Length - 1)
+    {
+        order++;
+        size /= 1024;
+    }
+
+    return $"{size:0.##} {sizes[order]}";
 }
