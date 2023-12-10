@@ -72,7 +72,11 @@ namespace SingleFileExtractor.Core
                     index++;
                 }
 
+#if NETSTANDARD2_0
+                return Encoding.UTF8.GetString(buffer[..index].ToArray());
+#else
                 return Encoding.UTF8.GetString(buffer[..index]);
+#endif
             }
 
             return null;

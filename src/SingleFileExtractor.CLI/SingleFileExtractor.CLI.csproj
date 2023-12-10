@@ -22,25 +22,18 @@
     <Authors>Joery Droppers</Authors>
     <Version>2.1.0</Version>
     <PackageReadmeFile>NuGet.md</PackageReadmeFile>
-
     <PackageOutputDir>../../nupkg/</PackageOutputDir>
-    <Authors>Joery Droppers</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageProjectUrl>https://github.com/Droppers/SingleFileExtractor/</PackageProjectUrl>
   </PropertyGroup>
-
   <ItemGroup>
     <None Include="NuGet.md" Pack="true" PackagePath="\" />
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="4.1.0" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\SingleFileExtractor.Core\SingleFileExtractor.Core.csproj" />
   </ItemGroup>
-
-
 </Project>

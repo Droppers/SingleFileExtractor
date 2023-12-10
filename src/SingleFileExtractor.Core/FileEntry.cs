@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.IO;
+﻿using System.IO;
 using System.IO.Compression;
 using System.Runtime.CompilerServices;
 using System.Threading;
@@ -47,9 +46,15 @@ namespace SingleFileExtractor.Core
         [PublicAPI]
         public async Task ExtractToFileAsync(string targetFileName, CancellationToken cancellationToken = default)
         { 
+#if NETSTANDARD2_0
+            using var destination = OpenDestinationStream(targetFileName);
+            using var entryStream = await AsStreamAsync(cancellationToken);
+            await entryStream.CopyToAsync(destination, 81920, cancellationToken);
+#else
             await using var destination = OpenDestinationStream(targetFileName);
             await using var entryStream = await AsStreamAsync(cancellationToken);
             await entryStream.CopyToAsync(destination, cancellationToken);
+#endif
         }
 
         [PublicAPI]
@@ -82,13 +87,20 @@ namespace SingleFileExtractor.Core
             {
                 return new UnmanagedMemoryStream(ExecutableReader.ViewAccessor.SafeMemoryMappedViewHandle, Offset, Size);
             }
-
+            
+            var decompressedStream = new MemoryStream((int)Size);
+            
+#if NETSTANDARD2_0
+            using var compressedStream = new UnmanagedMemoryStream(ExecutableReader.ViewAccessor.SafeMemoryMappedViewHandle, Offset,
+                CompressedSize);
+            using var deflateStream = new DeflateStream(compressedStream, CompressionMode.Decompress);
+            await deflateStream.CopyToAsync(decompressedStream, 81920, cancellationToken);
+#else
             await using var compressedStream = new UnmanagedMemoryStream(ExecutableReader.ViewAccessor.SafeMemoryMappedViewHandle, Offset,
                 CompressedSize);
             await using var deflateStream = new DeflateStream(compressedStream, CompressionMode.Decompress);
-            var decompressedStream = new MemoryStream((int)Size);
             await deflateStream.CopyToAsync(decompressedStream, cancellationToken);
-
+#endif
 
             decompressedStream.Seek(0, SeekOrigin.Begin);
             return decompressedStream;
