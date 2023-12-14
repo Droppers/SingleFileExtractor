@@ -1,6 +1,6 @@
 <h1 align="center">📁 SingleFileExtractor</h1></br>
 <p align="center">
-  A tool to extract the contents (assemblies, configuration, ...) of a single file application to a directory.
+  A tool for extracting contents (assemblies, configuration, etc.) from a single-file application to a directory, suitable for purposes like malware analysis.
 </p>
 
 <h6 align="center">
