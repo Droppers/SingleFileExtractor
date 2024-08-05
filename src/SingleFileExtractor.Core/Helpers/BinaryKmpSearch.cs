@@ -4,16 +4,16 @@ namespace SingleFileExtractor.Core.Helpers
 {
     internal static class BinaryKmpSearch
     {
-        public static unsafe int SearchInFile(MemoryMappedViewAccessor accessor, byte[] searchPattern)
+        public static unsafe long SearchInFile(MemoryMappedViewAccessor accessor, byte[] searchPattern)
         {
             var safeBuffer = accessor.SafeMemoryMappedViewHandle;
-            return KmpSearch(searchPattern, (byte*)safeBuffer.DangerousGetHandle(), (int)safeBuffer.ByteLength);
+            return KmpSearch(searchPattern, (byte*)safeBuffer.DangerousGetHandle(), (long)safeBuffer.ByteLength);
         }
 
         // See: https://en.wikipedia.org/wiki/Knuth%E2%80%93Morris%E2%80%93Pratt_algorithm
-        private static int[] ComputeKmpFailureFunction(byte[] pattern)
+        private static long[] ComputeKmpFailureFunction(byte[] pattern)
         {
-            var table = new int[pattern.Length];
+            var table = new long[pattern.Length];
             if (pattern.Length >= 1)
             {
                 table[0] = -1;
@@ -24,8 +24,8 @@ namespace SingleFileExtractor.Core.Helpers
                 table[1] = 0;
             }
 
-            var pos = 2;
-            var cnd = 0;
+            var pos = 2L;
+            var cnd = 0L;
             while (pos < pattern.Length)
             {
                 if (pattern[pos - 1] == pattern[cnd])
@@ -49,10 +49,10 @@ namespace SingleFileExtractor.Core.Helpers
         }
 
         // See: https://en.wikipedia.org/wiki/Knuth%E2%80%93Morris%E2%80%93Pratt_algorithm
-        private static unsafe int KmpSearch(byte[] pattern, byte* bytes, long bytesLength)
+        private static unsafe long KmpSearch(byte[] pattern, byte* bytes, long bytesLength)
         {
-            var m = 0;
-            var i = 0;
+            var m = 0L;
+            var i = 0L;
             var table = ComputeKmpFailureFunction(pattern);
 
             while (m + i < bytesLength)
