@@ -1,9 +1,8 @@
-﻿namespace SingleFileExtractor.Core.Legacy
+﻿namespace SingleFileExtractor.Core.Legacy;
+
+public interface IExecutableReader
 {
-    public interface IExecutableReader
-    {
-        Manifest ReadManifest(string fileName);
-        
-        StartupInfo ReadStartupInfo(string fileName);
-    }
+    Manifest ReadManifest(string fileName);
+
+    StartupInfo ReadStartupInfo(string fileName);
 }

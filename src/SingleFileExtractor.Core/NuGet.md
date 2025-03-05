@@ -1,7 +1,10 @@
 # About
-This is a library to programmatically extract the contents (assemblies, symbols, configuration, ...) of a single file application to a directory.
+
+This is a library to programmatically extract the contents (assemblies, symbols, configuration, ...) of a single file
+application to a directory.
 
 # Install
+
 Install the `SingleFileExtractor.Core` NuGet package for your project.
 
 Types from version 1.x are available under the SingleFileExtractor.Core.Legacy namespace.

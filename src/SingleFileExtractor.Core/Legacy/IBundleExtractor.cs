@@ -1,7 +1,6 @@
-﻿namespace SingleFileExtractor.Core.Legacy
+﻿namespace SingleFileExtractor.Core.Legacy;
+
+public interface IBundleExtractor
 {
-    public interface IBundleExtractor
-    {
-        Manifest ExtractToDirectory(string fileName, string outputDirectory);
-    }
+    Manifest ExtractToDirectory(string fileName, string outputDirectory);
 }

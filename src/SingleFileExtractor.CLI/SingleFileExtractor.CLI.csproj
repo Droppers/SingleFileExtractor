@@ -1,16 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
   </PropertyGroup>
-
   <PropertyGroup>
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>sfextract</ToolCommandName>
   </PropertyGroup>
-  
   <PropertyGroup>
     <PackageId>sfextract</PackageId>
     <IsPackable>true</IsPackable>
@@ -20,7 +17,7 @@
     <PackageDescription>A tool to extract the contents of a single file application to a directory.</PackageDescription>
     <PackageTags>single-file;executable;extractor</PackageTags>
     <Authors>Joery Droppers</Authors>
-    <Version>2.1.0</Version>
+    <Version>2.3.0</Version>
     <PackageReadmeFile>NuGet.md</PackageReadmeFile>
     <PackageOutputDir>../../nupkg/</PackageOutputDir>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -28,12 +25,12 @@
     <PackageProjectUrl>https://github.com/Droppers/SingleFileExtractor/</PackageProjectUrl>
   </PropertyGroup>
   <ItemGroup>
-    <None Include="NuGet.md" Pack="true" PackagePath="\" />
+    <None Include="NuGet.md" Pack="true" PackagePath="\"/>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="4.1.1" />
+    <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="4.1.1"/>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SingleFileExtractor.Core\SingleFileExtractor.Core.csproj" />
+    <ProjectReference Include="..\SingleFileExtractor.Core\SingleFileExtractor.Core.csproj"/>
   </ItemGroup>
 </Project>

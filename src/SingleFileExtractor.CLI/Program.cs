@@ -10,7 +10,8 @@ var app = new CommandLineApplication();
 app.HelpOption();
 
 var fileOption = app.Argument("executable", "The single file executable to be extracted").IsRequired();
-var outputOption = app.Option("-o|--output <DIRECTORY>", "(optional) The directory to write the extracted files to. Omit this option to only list the files.",
+var outputOption = app.Option("-o|--output <DIRECTORY>",
+    "(optional) The directory to write the extracted files to. Omit this option to only list the files.",
     CommandOptionType.SingleValue);
 
 app.OnExecuteAsync(async cancellationToken =>
@@ -44,7 +45,7 @@ static async Task RunExtractorAsync(string fileName, string? outputDirectory, Ca
         if (!reader.IsSupported)
         {
             Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("Is not a .NET Core 3.x, 5.0 or 6.0 executable.");
+            Console.WriteLine("Is not a .NET Core 3.x or greater executable.");
             Console.ResetColor();
             return;
         }
@@ -68,7 +69,7 @@ static async Task RunExtractorAsync(string fileName, string? outputDirectory, Ca
         if (outputDirectory is null)
         {
             Console.WriteLine($"Contains {reader.Bundle.Files.Count} files:");
-            
+
             foreach (var file in reader.Bundle.Files)
             {
                 Console.WriteLine($" - {file.RelativePath} ({HumanizeFileSize(file.Size)}, {file.Size} bytes)");
